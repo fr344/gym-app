@@ -7,6 +7,7 @@ const VIEWS = {
   settings: renderSettings,
   workout:  renderWorkout,
   generate: renderGenerate,
+  builder:  renderBuilder,
 };
 
 let currentView = null;

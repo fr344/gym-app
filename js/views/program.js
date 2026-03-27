@@ -15,8 +15,9 @@ async function renderProgram(container) {
           <h2>No active program</h2>
           <p>Generate a program to see it here.</p>
         </div>
-        <div class="px-16">
-          <button class="btn btn-primary" onclick="navigate('generate')">Generate Program</button>
+        <div class="px-16" style="display:flex;flex-direction:column;gap:10px">
+          <button class="btn btn-primary" onclick="navigate('builder')">Build Manually</button>
+          <button class="btn btn-secondary" onclick="navigate('generate')">Generate with Claude</button>
         </div>
       </div>`;
     return;
@@ -86,8 +87,9 @@ async function renderProgram(container) {
       <div class="section-label">Workout Days</div>
       ${dayCards}
 
-      <div class="px-16 mt-16">
-        <button class="btn btn-ghost" onclick="navigate('generate')">Generate New Program</button>
+      <div class="px-16 mt-16" style="display:flex;flex-direction:column;gap:10px">
+        <button class="btn btn-secondary" onclick="navigate('builder')">Build Manually</button>
+        <button class="btn btn-ghost" onclick="navigate('generate')">Generate with Claude</button>
       </div>
     </div>`;
 

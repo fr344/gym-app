@@ -1,4 +1,4 @@
-const CACHE = 'gym-v1';
+const CACHE = 'gym-v2';
 
 // Use a dynamic base so paths work on any hosting (GitHub Pages, localhost, etc.)
 const BASE = self.location.pathname.replace('/sw.js', '');
@@ -9,6 +9,7 @@ const ASSETS = [
   `${BASE}/css/style.css`,
   `${BASE}/js/db.js`,
   `${BASE}/js/ai.js`,
+  `${BASE}/js/exercises.js`,
   `${BASE}/js/app.js`,
   `${BASE}/js/views/today.js`,
   `${BASE}/js/views/workout.js`,
@@ -16,6 +17,7 @@ const ASSETS = [
   `${BASE}/js/views/generate.js`,
   `${BASE}/js/views/history.js`,
   `${BASE}/js/views/settings.js`,
+  `${BASE}/js/views/builder.js`,
 ];
 
 self.addEventListener('install', e => {

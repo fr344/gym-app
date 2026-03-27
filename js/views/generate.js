@@ -5,9 +5,12 @@ async function renderGenerate(container, params = {}) {
 
   container.innerHTML = `
     <div class="view">
-      <div class="page-header">
-        <h1>New Program</h1>
-        <p class="subtitle">Answer a few questions, Claude builds your plan.</p>
+      <div class="page-header" style="display:flex;align-items:flex-start;justify-content:space-between">
+        <div>
+          <h1>New Program</h1>
+          <p class="subtitle">Answer a few questions, Claude builds your plan.</p>
+        </div>
+        <button class="btn btn-sm btn-ghost" onclick="navigate('builder')" style="margin-top:52px;flex-shrink:0">Build manually</button>
       </div>
 
       ${hasExisting ? `
