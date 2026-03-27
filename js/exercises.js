@@ -610,6 +610,44 @@ const EXERCISES = [
     pattern: 'core',
     cue: 'Sit at 45°, feet raised or on floor. Rotate torso side to side — not just the arms. Hold a weight for progression. Targets obliques.',
   },
+
+  // ── VOLLEYBALL / ATHLETIC ─────────────────────────────────────────────────
+  {
+    id: 'side_lunge',
+    name: 'Side Lunge',
+    muscleGroup: 'Quads',
+    secondaryMuscles: ['Glutes', 'Adductors', 'Hamstrings'],
+    equipment: ['bodyweight', 'dumbbell'],
+    pattern: 'legs',
+    cue: 'Step wide to one side, pushing hips back and down into the lunge. Keep chest up and grounded foot flat. Inner thigh and glute stretch at bottom. Drive through heel to return. Key for lateral athletic movement.',
+  },
+  {
+    id: 'power_shrug',
+    name: 'Power Shrug',
+    muscleGroup: 'Traps',
+    secondaryMuscles: ['Shoulders', 'Glutes', 'Hamstrings'],
+    equipment: ['barbell'],
+    pattern: 'pull',
+    cue: 'Start position like a deadlift. Explosively extend hips, knees and ankles (triple extension) then shrug shoulders hard upward. Let the momentum carry the bar — don\'t pull with arms. Trains the power transfer from legs to upper body used in jumping and spiking.',
+  },
+  {
+    id: 'box_jump',
+    name: 'Box Jump 24"',
+    muscleGroup: 'Quads',
+    secondaryMuscles: ['Glutes', 'Hamstrings', 'Calves', 'Core'],
+    equipment: ['bodyweight'],
+    pattern: 'legs',
+    cue: 'Stand arms-length from box. Dip and swing arms, then explode upward — land softly with bent knees in a squat position. Step down (don\'t jump down) to protect knees. Focus on maximal intent on every rep. Rest fully between sets — this is power work, not cardio.',
+  },
+  {
+    id: 'single_leg_tband_pull',
+    name: 'Single Leg T-Band Pull',
+    muscleGroup: 'Glutes',
+    secondaryMuscles: ['Core', 'Hamstrings', 'Hip Stabilisers'],
+    equipment: ['bodyweight'],
+    pattern: 'legs',
+    cue: 'Anchor a resistance band at foot height. Stand on one leg, slight knee bend. Pull the band back behind you in a controlled hip extension while maintaining balance. Challenges single-leg stability critical for landing mechanics in volleyball. Keep hips level throughout — don\'t rotate.',
+  },
 ];
 
 // ── Muscle groups for filtering ───────────────────────────────────────────────

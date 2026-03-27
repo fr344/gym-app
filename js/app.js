@@ -42,19 +42,7 @@ if ('serviceWorker' in navigator) {
 
 // ── Boot ──────────────────────────────────────────────────────────────────────
 async function boot() {
-  // Check if user has an API key set
-  const apiKey = await DB.getApiKey();
-  const program = await DB.getActiveProgram();
-
-  if (!apiKey) {
-    navigate('settings');
-    document.querySelector('[data-view="settings"]').classList.add('active');
-  } else if (!program) {
-    navigate('generate');
-    document.querySelector('[data-view="program"]').classList.add('active');
-  } else {
-    navigate('today');
-  }
+  navigate('today');
 }
 
 boot();

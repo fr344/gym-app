@@ -8,7 +8,7 @@ async function renderGenerate(container, params = {}) {
       <div class="page-header" style="display:flex;align-items:flex-start;justify-content:space-between">
         <div>
           <h1>New Program</h1>
-          <p class="subtitle">Answer a few questions, Claude builds your plan.</p>
+          <p class="subtitle">Generate with Claude or load a preset.</p>
         </div>
         <button class="btn btn-sm btn-ghost" onclick="navigate('builder')" style="margin-top:52px;flex-shrink:0">Build manually</button>
       </div>
@@ -17,6 +17,25 @@ async function renderGenerate(container, params = {}) {
         <div class="banner banner-info" style="margin:0 16px 16px">
           ⚠ This will replace your current program.
         </div>` : ''}
+
+      <!-- Presets -->
+      <div class="section-label">Presets</div>
+      ${PRESETS.map(p => `
+        <div class="card preset-card" data-preset-id="${p.id}" style="cursor:pointer;display:flex;align-items:center;gap:12px">
+          <div style="flex:1">
+            <div style="font-size:15px;font-weight:600;margin-bottom:2px">${p.name}</div>
+            <div style="font-size:13px;color:var(--muted);line-height:1.5">${p.description}</div>
+            <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap">
+              ${p.tags.map(t => `<span style="font-size:11px;font-weight:600;padding:3px 8px;border-radius:10px;border:1px solid var(--border);color:var(--muted)">${t}</span>`).join('')}
+              <span style="font-size:11px;font-weight:600;padding:3px 8px;border-radius:10px;border:1px solid var(--border);color:var(--muted)">${p.daysPerWeek} days/wk</span>
+            </div>
+          </div>
+          <svg viewBox="0 0 24 24" width="18" height="18" style="stroke:var(--muted);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0">
+            <polyline points="9 18 15 12 9 6"/>
+          </svg>
+        </div>`).join('')}
+
+      <div class="section-label" style="margin-top:8px">Generate with Claude</div>
 
       <!-- Program Name -->
       <div class="form-group">
@@ -97,6 +116,9 @@ async function renderGenerate(container, params = {}) {
       chip.classList.toggle('selected');
     });
   });
+
+  // ── Presets ───────────────────────────────────────────────────────────────
+  _attachPresetListeners(container);
 
   // ── Generate ──────────────────────────────────────────────────────────────
   container.querySelector('#generate-btn').addEventListener('click', async () => {
@@ -203,6 +225,103 @@ function _showProgramPreview(container, program, schedule) {
         <button class="btn btn-ghost" onclick="navigate('generate')" style="margin-top:10px">Regenerate</button>
       </div>
     </div>`;
+}
+
+// ── Preset loader ─────────────────────────────────────────────────────────────
+function _attachPresetListeners(container) {
+  container.querySelectorAll('.preset-card').forEach(card => {
+    card.addEventListener('click', () => {
+      const preset = PRESETS.find(p => p.id === card.dataset.presetId);
+      if (preset) _loadPreset(container, preset);
+    });
+  });
+}
+
+function _loadPreset(container, preset) {
+  const weekDays = ['mon','tue','wed','thu','fri','sat','sun'];
+  const weekLabels = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+  const dayOptions = preset.days.map(d =>
+    `<option value="${d.id}">${d.name}</option>`).join('');
+
+  // Default schedule: spread sessions across the week sensibly
+  const defaults = { vb_session1: 'tue', vb_session2: 'thu' };
+
+  const rows = weekDays.map((d, i) => {
+    const defaultVal = Object.entries(defaults).find(([, v]) => v === d)?.[0] || '';
+    return `
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)">
+        <span style="font-size:14px;color:var(--muted);min-width:90px">${weekLabels[i]}</span>
+        <select class="form-select sched-select" data-day="${d}"
+          style="max-width:200px;padding:8px 32px 8px 12px;font-size:13px;flex:1;margin-left:12px">
+          <option value="">Rest</option>
+          ${dayOptions.replace(`value="${defaultVal}"`, `value="${defaultVal}" selected`)}
+        </select>
+      </div>`;
+  }).join('');
+
+  container.innerHTML = `
+    <div class="view">
+      <div class="page-header">
+        <h1>${preset.name}</h1>
+        <p class="subtitle">${preset.daysPerWeek} days/week · ${preset.goal}</p>
+      </div>
+
+      <div class="section-label">Sessions</div>
+      ${preset.days.map(d => `
+        <div class="card">
+          <div class="card-title">${d.focus || d.name}</div>
+          <div style="font-weight:600;font-size:15px;margin-bottom:10px">${d.name}</div>
+          ${d.exercises.map(ex => `
+            <div class="exercise-row">
+              <div class="exercise-info">
+                <div class="exercise-name">${ex.name}</div>
+                <div class="exercise-meta">${ex.sets} sets · ${ex.reps} reps${ex.weight ? ` · ${ex.weight}kg` : ''}</div>
+              </div>
+            </div>`).join('')}
+        </div>`).join('')}
+
+      <div class="section-label">4-Week Progression</div>
+      <div class="card">
+        ${Object.entries(preset.progression).map(([w, desc]) => `
+          <div style="padding:8px 0;border-bottom:1px solid var(--border)">
+            <div style="font-weight:600;font-size:13px;text-transform:capitalize">${w.replace('week','Week ')}</div>
+            <div style="color:var(--muted);font-size:13px;margin-top:2px">${desc}</div>
+          </div>`).join('')}
+      </div>
+
+      <div class="section-label">Assign to Schedule</div>
+      <div class="card">${rows}</div>
+
+      <div class="px-16 mt-16" style="display:flex;flex-direction:column;gap:10px;padding-bottom:32px">
+        <button class="btn btn-primary" id="load-preset-btn">Load Program</button>
+        <button class="btn btn-ghost" onclick="navigate('generate')">Back</button>
+      </div>
+    </div>`;
+
+  container.querySelector('#load-preset-btn').addEventListener('click', async () => {
+    const schedule = {};
+    const allDays = ['mon','tue','wed','thu','fri','sat','sun'];
+    allDays.forEach(d => { schedule[d] = null; });
+    container.querySelectorAll('.sched-select').forEach(sel => {
+      schedule[sel.dataset.day] = sel.value || null;
+    });
+
+    const program = {
+      ...preset,
+      id: DB.generateId(),
+      createdAt: new Date().toISOString(),
+      isActive: true,
+      isManual: false,
+    };
+
+    const existing = await DB.programs.getAll();
+    for (const p of existing) { p.isActive = false; await DB.programs.save(p); }
+
+    await DB.programs.save(program);
+    await DB.setActiveProgram(program.id);
+    await DB.setSchedule(schedule);
+    navigate('today');
+  });
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
