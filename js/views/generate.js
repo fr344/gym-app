@@ -243,18 +243,22 @@ function _loadPreset(container, preset) {
   const dayOptions = preset.days.map(d =>
     `<option value="${d.id}">${d.name}</option>`).join('');
 
-  // Default schedule: spread sessions across the week sensibly
-  const defaults = { vb_session1: 'tue', vb_session2: 'thu' };
+  // Use preset's defaultSchedule to pre-select dropdowns
+  const defaultSched = preset.defaultSchedule || {};
 
   const rows = weekDays.map((d, i) => {
-    const defaultVal = Object.entries(defaults).find(([, v]) => v === d)?.[0] || '';
+    const defaultVal = defaultSched[d] || '';
+    // Build options, marking the default as selected
+    const opts = `<option value="">Rest</option>` +
+      preset.days.map(pd =>
+        `<option value="${pd.id}"${pd.id === defaultVal ? ' selected' : ''}>${pd.name}</option>`
+      ).join('');
     return `
       <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)">
         <span style="font-size:14px;color:var(--muted);min-width:90px">${weekLabels[i]}</span>
         <select class="form-select sched-select" data-day="${d}"
           style="max-width:200px;padding:8px 32px 8px 12px;font-size:13px;flex:1;margin-left:12px">
-          <option value="">Rest</option>
-          ${dayOptions.replace(`value="${defaultVal}"`, `value="${defaultVal}" selected`)}
+          ${opts}
         </select>
       </div>`;
   }).join('');
