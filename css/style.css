@@ -94,6 +94,9 @@ html, body {
 /* ── Page Header ── */
 .page-header {
   padding: 56px 20px 20px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
 }
 
 .page-header h1 {

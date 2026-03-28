@@ -140,7 +140,7 @@ async function renderSettings(container) {
       </div>
 
       <div style="text-align:center;padding:32px 20px;color:var(--muted);font-size:12px">
-        Gym Tracker · Built with Claude
+        Gym Tracker · Built with Claude${devMode ? ` · <span style="color:var(--accent);font-family:monospace">${typeof APP_VERSION !== 'undefined' ? APP_VERSION : ''}</span>` : ''}
       </div>
     </div>`;
 

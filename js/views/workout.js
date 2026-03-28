@@ -173,6 +173,43 @@ async function _finishWorkout(container) {
 
   await DB.logs.save(log);
 
+  // ── Detect weight changes and update program ──────────────────────────────
+  const weightUpdates = [];
+  const updatedProgram = JSON.parse(JSON.stringify(program));
+  const programDay = updatedProgram.days.find(d => d.id === day.id);
+
+  if (programDay) {
+    exercises.forEach(ex => {
+      const doneSets = ex.sets.filter(s => s.done);
+      if (!doneSets.length) return;
+
+      // Use the weight from the last done set (most recent adjustment)
+      const lastWeight = doneSets[doneSets.length - 1].weight;
+      const programEx = programDay.exercises.find(e => e.id === ex.id);
+
+      if (programEx && lastWeight !== programEx.weight) {
+        weightUpdates.push({ name: ex.name, old: programEx.weight, new: lastWeight });
+        programEx.weight = lastWeight;
+      }
+    });
+
+    if (weightUpdates.length) {
+      await DB.programs.save(updatedProgram);
+    }
+  }
+
+  const totalDone = exercises.reduce((s, ex) => s + ex.sets.filter(x => x.done).length, 0);
+
+  const updatesHtml = weightUpdates.length ? `
+    <div style="width:100%;background:var(--surface);border-radius:12px;padding:14px 16px;margin-top:24px;text-align:left">
+      <div style="font-size:12px;font-weight:600;color:var(--green);letter-spacing:.05em;margin-bottom:8px">WEIGHTS UPDATED FOR NEXT SESSION</div>
+      ${weightUpdates.map(u => `
+        <div style="font-size:13px;color:var(--muted);padding:4px 0;display:flex;justify-content:space-between">
+          <span>${u.name}</span>
+          <span style="color:var(--text)">${u.old}kg → ${u.new}kg</span>
+        </div>`).join('')}
+    </div>` : '';
+
   // Show completion screen
   container.innerHTML = `
     <div class="view">
@@ -183,8 +220,9 @@ async function _finishWorkout(container) {
         <h2>Workout Done</h2>
         <p>${day.name} · ${durationMin} min</p>
         <p class="text-muted" style="font-size:13px;margin-top:4px">
-          ${exercises.reduce((s, ex) => s + ex.sets.filter(x => x.done).length, 0)} sets completed
+          ${totalDone} sets completed
         </p>
+        ${updatesHtml}
         <div style="width:100%;margin-top:32px">
           <button class="btn btn-primary" onclick="navigate('today')">Back to Today</button>
           <button class="btn btn-ghost mt-8" onclick="navigate('history')" style="margin-top:10px">View History</button>

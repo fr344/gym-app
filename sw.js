@@ -1,4 +1,4 @@
-const CACHE = 'gym-v6';
+const CACHE = 'gym-v7';
 
 // Use a dynamic base so paths work on any hosting (GitHub Pages, localhost, etc.)
 const BASE = self.location.pathname.replace('/sw.js', '');

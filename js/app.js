@@ -1,4 +1,5 @@
 // ── App Shell & Router ────────────────────────────────────────────────────────
+const APP_VERSION = 'v0.7';
 
 const VIEWS = {
   today:    renderToday,
