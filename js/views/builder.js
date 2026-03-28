@@ -11,7 +11,22 @@ function freshBuilderState() {
 }
 
 async function renderBuilder(container, params = {}) {
-  _b = params.edit || freshBuilderState();
+  if (params.edit) {
+    const prog = params.edit;
+    _b = {
+      id: prog.id,           // keep existing ID so we update in place
+      name: prog.name,
+      activeDay: 0,
+      isEdit: true,
+      existingSchedule: params.schedule || null,
+      days: prog.days.map(d => ({
+        ...d,
+        exercises: d.exercises.map(e => ({ ...e })),
+      })),
+    };
+  } else {
+    _b = freshBuilderState();
+  }
   _renderBuilderUI(container);
 }
 
@@ -63,7 +78,7 @@ function _renderBuilderUI(container) {
 
       <!-- Save -->
       <div class="px-16 mt-16" style="display:flex;flex-direction:column;gap:10px;padding-bottom:32px">
-        <button class="btn btn-primary" id="save-program-btn">Save Program</button>
+        <button class="btn btn-primary" id="save-program-btn">${_b.isEdit ? 'Save Changes' : 'Save Program'}</button>
         <button class="btn btn-ghost" onclick="navigate('program')">Cancel</button>
       </div>
     </div>
@@ -717,32 +732,37 @@ async function _saveProgram(container) {
 }
 
 function _showSchedulePicker(container) {
-  const dayOptions = _b.days.map(d =>
-    `<option value="${d.id}">${escHtml(d.name)}</option>`).join('');
-
   const weekDays = ['mon','tue','wed','thu','fri','sat','sun'];
   const weekLabels = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+  const existingSched = _b.existingSchedule || {};
 
-  const rows = weekDays.map((d, i) => `
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)">
-      <span style="font-size:14px;color:var(--muted);min-width:90px">${weekLabels[i]}</span>
-      <select class="form-select sched-select" data-day="${d}"
-        style="max-width:200px;padding:8px 32px 8px 12px;font-size:13px;flex:1;margin-left:12px">
-        <option value="">Rest</option>
-        ${dayOptions}
-      </select>
-    </div>`).join('');
+  const rows = weekDays.map((d, i) => {
+    const currentVal = existingSched[d] || '';
+    const opts = `<option value="">Rest</option>` +
+      _b.days.map(day =>
+        `<option value="${day.id}"${day.id === currentVal ? ' selected' : ''}>${escHtml(day.name)}</option>`
+      ).join('');
+    return `
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)">
+        <span style="font-size:14px;color:var(--muted);min-width:90px">${weekLabels[i]}</span>
+        <select class="form-select sched-select" data-day="${d}"
+          style="max-width:200px;padding:8px 32px 8px 12px;font-size:13px;flex:1;margin-left:12px">
+          ${opts}
+        </select>
+      </div>`;
+  }).join('');
 
   container.querySelector('#day-content').innerHTML = `
     <div style="padding:16px 20px">
-      <h3 style="font-size:17px;font-weight:700;margin-bottom:4px">Assign to Schedule</h3>
+      <h3 style="font-size:17px;font-weight:700;margin-bottom:4px">
+        ${_b.isEdit ? 'Update Schedule' : 'Assign to Schedule'}
+      </h3>
       <p style="font-size:13px;color:var(--muted);margin-bottom:16px">Which day of the week does each workout fall on?</p>
       ${rows}
     </div>`;
 
-  // Hide measurements and show confirm
   container.querySelector('#measurements-card').style.display = 'none';
-  container.querySelector('#save-program-btn').textContent = 'Confirm & Save';
+  container.querySelector('#save-program-btn').textContent = _b.isEdit ? 'Save Changes' : 'Confirm & Save';
   container.querySelector('#save-program-btn').onclick = () => _confirmSave(container);
 }
 
@@ -756,20 +776,26 @@ async function _confirmSave(container) {
     id: _b.id || DB.generateId(),
     name: _b.name,
     daysPerWeek: _b.days.filter(d => d.exercises.length > 0).length,
-    goal: 'custom',
+    goal: _b.isEdit ? (await DB.getActiveProgram())?.goal || 'custom' : 'custom',
     days: _b.days,
-    createdAt: new Date().toISOString(),
+    createdAt: _b.isEdit ? (await DB.getActiveProgram())?.createdAt || new Date().toISOString() : new Date().toISOString(),
     isActive: true,
     isManual: true,
   };
 
-  // Deactivate old programs
-  const existing = await DB.programs.getAll();
-  for (const p of existing) { p.isActive = false; await DB.programs.save(p); }
-
-  await DB.programs.save(program);
-  await DB.setActiveProgram(program.id);
-  await DB.setSchedule(schedule);
+  if (_b.isEdit) {
+    // Update in place — don't touch other programs
+    await DB.programs.save(program);
+    await DB.setActiveProgram(program.id);
+    await DB.setSchedule(schedule);
+  } else {
+    // New program — deactivate all existing first
+    const existing = await DB.programs.getAll();
+    for (const p of existing) { p.isActive = false; await DB.programs.save(p); }
+    await DB.programs.save(program);
+    await DB.setActiveProgram(program.id);
+    await DB.setSchedule(schedule);
+  }
 
   navigate('program');
 }

@@ -106,7 +106,39 @@ const DB = {
   // ── Utils ─────────────────────────────────────────────────────────────────
   generateId: () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7),
 
-  todayStr: () => new Date().toISOString().slice(0, 10),
+  todayStr: () => {
+    const override = localStorage.getItem('gymDevDay');
+    if (override) {
+      // Return a fake date string that matches the simulated weekday
+      // Use a fixed reference week so logs don't collide with real ones
+      const dayIndex = ['sun','mon','tue','wed','thu','fri','sat'].indexOf(override);
+      const d = new Date('2099-01-01'); // far future — won't clash with real logs
+      const offset = (dayIndex - d.getDay() + 7) % 7;
+      d.setDate(d.getDate() + offset);
+      return d.toISOString().slice(0, 10);
+    }
+    return new Date().toISOString().slice(0, 10);
+  },
 
-  dayOfWeek: () => ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'][new Date().getDay()],
+  dayOfWeek: () => {
+    const override = localStorage.getItem('gymDevDay');
+    if (override) return override;
+    return ['sun','mon','tue','wed','thu','fri','sat'][new Date().getDay()];
+  },
+
+  // ── Dev helpers ───────────────────────────────────────────────────────────
+  dev: {
+    isEnabled: () => localStorage.getItem('gymDevMode') === 'true',
+    setDay: day => {
+      if (day) localStorage.setItem('gymDevDay', day);
+      else localStorage.removeItem('gymDevDay');
+    },
+    getDay: () => localStorage.getItem('gymDevDay') || '',
+    setMode: on => {
+      localStorage.setItem('gymDevMode', on ? 'true' : 'false');
+      if (!on) localStorage.removeItem('gymDevDay');
+    },
+    setMockAI: on => localStorage.setItem('gymMockAI', on ? 'true' : 'false'),
+    isMockAI: () => localStorage.getItem('gymMockAI') === 'true',
+  },
 };

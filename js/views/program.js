@@ -66,9 +66,21 @@ async function renderProgram(container) {
 
   container.innerHTML = `
     <div class="view">
-      <div class="page-header">
-        <h1>${program.name}</h1>
-        <p class="subtitle">Created ${created} · ${program.daysPerWeek} days/week</p>
+      <div class="page-header" style="display:flex;align-items:flex-start;justify-content:space-between">
+        <div>
+          <h1>${program.name}</h1>
+          <p class="subtitle">Created ${created} · ${program.daysPerWeek} days/week</p>
+        </div>
+        <button id="edit-program-btn"
+          style="margin-top:52px;padding:6px 12px;border-radius:8px;border:1px solid var(--border);
+                 background:none;color:var(--muted);font-size:13px;font-weight:600;cursor:pointer;
+                 flex-shrink:0;display:flex;align-items:center;gap:5px">
+          <svg viewBox="0 0 24 24" width="13" height="13" style="stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round">
+            <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
+            <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
+          </svg>
+          Edit
+        </button>
       </div>
 
       <div class="section-label">Weekly Schedule</div>
@@ -102,5 +114,10 @@ async function renderProgram(container) {
       const isOpen = body.classList.toggle('open');
       chevron.style.transform = isOpen ? 'rotate(180deg)' : '';
     });
+  });
+
+  // Edit button → open builder with current program pre-loaded
+  container.querySelector('#edit-program-btn')?.addEventListener('click', () => {
+    navigate('builder', { edit: program, schedule });
   });
 }
