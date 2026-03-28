@@ -71,11 +71,12 @@ async function renderHistory(container) {
               style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:10px;
                 padding:12px 14px;color:var(--text);font-size:16px;box-sizing:border-box" />
           </div>
-          <div style="flex:1;min-width:0">
+          <div style="flex:1;min-width:0;overflow:hidden">
             <div style="font-size:12px;color:var(--muted);margin-bottom:6px">DATE</div>
             <input id="body-date-input" type="date" value="${DB.todayStr()}"
-              style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:10px;
-                padding:12px 14px;color:var(--text);font-size:16px;box-sizing:border-box" />
+              style="width:100%;max-width:100%;background:var(--bg);border:1px solid var(--border);
+                border-radius:10px;padding:12px 10px;color:var(--text);font-size:15px;
+                box-sizing:border-box;-webkit-appearance:none;appearance:none" />
           </div>
         </div>
         <button id="save-body-btn" class="btn btn-primary" style="width:100%">Log Weight</button>
