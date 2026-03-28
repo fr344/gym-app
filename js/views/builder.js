@@ -620,7 +620,7 @@ function _attachBuilderListeners(container) {
   _initDragReorder(container);
 
   // Save program
-  container.querySelector('#save-program-btn').addEventListener('click', () => _saveProgram(container));
+  container.querySelector('#save-program-btn').onclick = () => _saveProgram(container);
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
