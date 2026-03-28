@@ -51,7 +51,7 @@ async function renderHistory(container) {
     <div id="body-stats-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200"></div>
     <div id="body-stats-panel" style="display:none;position:fixed;bottom:0;left:0;right:0;
       background:var(--surface);border-radius:20px 20px 0 0;z-index:201;
-      max-height:80vh;overflow-y:auto;padding:0 0 40px">
+      max-height:80vh;overflow-y:auto;overflow-x:hidden;padding:0 0 40px;box-sizing:border-box">
       <div style="display:flex;align-items:center;justify-content:space-between;padding:20px 20px 16px">
         <h2 style="font-size:18px;font-weight:700;margin:0">Body Weight</h2>
         <button id="close-stats-btn" style="background:none;border:none;cursor:pointer;color:var(--muted);padding:4px">
@@ -63,23 +63,22 @@ async function renderHistory(container) {
 
       <!-- Log entry form -->
       <div style="padding:0 20px 20px;border-bottom:1px solid var(--border)">
-        <div style="display:flex;gap:10px;align-items:flex-end">
-          <div style="flex:1">
+        <div style="display:flex;gap:10px;margin-bottom:10px">
+          <div style="flex:1;min-width:0">
             <div style="font-size:12px;color:var(--muted);margin-bottom:6px">WEIGHT (KG)</div>
             <input id="body-weight-input" type="number" inputmode="decimal" step="0.1"
-              placeholder="e.g. 82.5"
+              placeholder="82.5"
               style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:10px;
                 padding:12px 14px;color:var(--text);font-size:16px;box-sizing:border-box" />
           </div>
-          <div style="flex:1">
+          <div style="flex:1;min-width:0">
             <div style="font-size:12px;color:var(--muted);margin-bottom:6px">DATE</div>
             <input id="body-date-input" type="date" value="${DB.todayStr()}"
               style="width:100%;background:var(--bg);border:1px solid var(--border);border-radius:10px;
                 padding:12px 14px;color:var(--text);font-size:16px;box-sizing:border-box" />
           </div>
-          <button id="save-body-btn" class="btn btn-primary"
-            style="padding:12px 20px;flex-shrink:0;margin-bottom:0">Log</button>
         </div>
+        <button id="save-body-btn" class="btn btn-primary" style="width:100%">Log Weight</button>
       </div>
 
       <!-- Chart + entries rendered by JS -->
